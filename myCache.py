@@ -19,12 +19,13 @@ class CacheSim:
 
     def get_total_misses(self):
         return reduce(lambda x,y: x+y , self.MISSES)
-    
+
     def find_position(self, address):
         return (address / self.bsize) % self.nsets 
     
-    def insert(self, position, address):
-        cache_set = random.randint(0, self.assoc - 1)
+    def insert(self, position, address, cache_set=None):
+        if cache_set is None:
+            cache_set = random.randint(0, self.assoc - 1)
         self.cache[position][cache_set] = address
     
     #TODO: Computar adequadamente cada tipo de miss
@@ -34,7 +35,7 @@ class CacheSim:
         first_address = int(address / self.bsize) * self.bsize
         for cache_set in range(self.assoc):
             if(self.cache[position][cache_set] == -1):
-                self.insert(position, first_address)
+                self.insert(position, first_address, cache_set=cache_set)
                 self.MISSES['compulsory'] +=1
         else:
             self.insert(position, first_address)
