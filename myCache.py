@@ -19,7 +19,7 @@ class CacheSim:
 
     def get_total_misses(self):
         return reduce(lambda x,y: x+y , self.MISSES)
-
+    
     def find_position(self, address):
         return (address / self.bsize) % self.nsets 
     
@@ -28,12 +28,14 @@ class CacheSim:
         self.cache[position][cache_set] = address
     
     #TODO: Computar adequadamente cada tipo de miss
+    #TODO: Computar quando há um hit 
     def get(self, address):
         position = self.find_position(address)
         first_address = int(address / self.bsize) * self.bsize
         for cache_set in range(self.assoc):
             if(self.cache[position][cache_set] == -1):
-                self.cache[position][cache_set] = first_address
+                self.insert(position, first_address)
+                self.MISSES['compulsory'] +=1
         else:
             self.insert(position, first_address)
             self.MISSES['conflict'] += 1
