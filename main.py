@@ -12,14 +12,15 @@ def main():
     nsets = int(args[1])
     assoc = int(args[2])
     file = open(sys.argv[2], "r").read()
-    print(f"\nBlock Size: {bsize}")
-    print(f"Number of Sets: {nsets}")
-    print(f"Associativity: {assoc}")
+    print("\n----------CACHE SETTINGS----------\n\n")
+    print(f"BLOCK SIZE: {bsize}")
+    print(f"NUMBER OF SETS: {nsets}")
+    print(f"ASSOCIATIVITY: {assoc}\n\n")
 
     c = CacheSim(bsize, nsets, assoc)
     for value in file.split(','):
         c.get(int(value))
-    print(c.get_total_misses)
+    c.print_statistics()
 
 if __name__ == "__main__":
     main()

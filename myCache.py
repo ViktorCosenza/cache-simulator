@@ -9,17 +9,27 @@ class CacheSim:
         self.bsize = int(bsize)
         self.assoc = int(assoc)
         self.size = self.nsets * self.bsize * self.assoc
-        self.TOTAL_INSERTS = 0
+        self.TOTAL_ACCESSES = 0
         self.MISSES = {
             'compulsory': 0,
-            'capacity': 0,
-            'conflict': 0
+            'other': 0
         }
         self.cache = np.zeros(shape=(nsets, assoc), dtype=int) -1
 
 
-    def get_total_misses(self):
-        return reduce(lambda x,y: x+y , self.MISSES)
+    def print_statistics(self):
+        total = reduce(lambda x,y: x+y , self.MISSES.values())
+        compulsory = self.MISSES['compulsory']
+        other = self.MISSES['other']
+        print("----------CACHE STATS----------\n\n")
+        print("-> ABSOLUTE STATS\n")
+        print(f"COMPULSORY MISSES: {compulsory}")
+        print("CAPACITY ", end='') if self.nsets == 1 else print("CONFLICT ", end='')
+        print(f"MISSES : {other}")
+        print(f"TOTAL MISSES: {total}")
+        print(f"TOTAL ACCESSES: {self.TOTAL_ACCESSES}\n")
+
+        print("-> PERCENTAGE STATS\n")
 
     def find_position(self, address):
         return int(address / self.bsize) % self.nsets 
@@ -30,14 +40,19 @@ class CacheSim:
         self.cache[position][cache_set] = address
     
     #TODO: Computar adequadamente cada tipo de miss
-    #TODO: Computar quando há um hit 
     def get(self, address):
         position = self.find_position(address)
         first_address = int(address / self.bsize) * self.bsize
         for cache_set in range(self.assoc):
+            #COMPULSORY MISS
             if(self.cache[position][cache_set] == -1):
                 self.insert(position, first_address, cache_set=cache_set)
                 self.MISSES['compulsory'] +=1
+            #HIT
+            if(self.cache[position][cache_set] == first_address):
+                break
+        #CAPACITY/CONFLICT MISS
         else:
             self.insert(position, first_address)
-            self.MISSES['conflict'] += 1
+            self.MISSES['other'] += 1
+        self.TOTAL_ACCESSES += 1
