@@ -1,27 +1,28 @@
 import numpy as np
 import random
+from functools import reduce
 
 class CacheSim:
     
     def __init__(self, nsets, bsize, assoc):
-        self.size = nsets * bsize * assoc
-        self.nsets = nsets
-        self.bsize = bsize
-        self.assoc = assoc
+        self.nsets = int(nsets)
+        self.bsize = int(bsize)
+        self.assoc = int(assoc)
+        self.size = self.nsets * self.bsize * self.assoc
         self.TOTAL_INSERTS = 0
         self.MISSES = {
             'compulsory': 0,
             'capacity': 0,
             'conflict': 0
         }
-        self.cache = np.empty(shape=(nsets, assoc), dtype=int).fill(-1)
+        self.cache = np.zeros(shape=(nsets, assoc), dtype=int) -1
 
 
     def get_total_misses(self):
         return reduce(lambda x,y: x+y , self.MISSES)
 
     def find_position(self, address):
-        return (address / self.bsize) % self.nsets 
+        return int(address / self.bsize) % self.nsets 
     
     def insert(self, position, address, cache_set=None):
         if cache_set is None:
