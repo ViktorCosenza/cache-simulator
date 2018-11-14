@@ -4,10 +4,12 @@ import sys
 from myCache import CacheSim
 
 
-#TODO adequar para parametro de entrada tipo "./main.py <bsize>:<nsets>:<assoc>"
-#TODO gerador de endereços ou maneira de portar o que o professor forneceu em java
 def main():
+    if len(sys.argv) < 3:
+        return print("\nMissing arguments!\n  nsets:bsize:assoc filename.extension")
     args = sys.argv[1].split(':')
+    if len(args) < 3:
+        return print("\nBad cache definition!\n nsets:bsize:assoc")
     bsize = int(args[0])
     nsets = int(args[1])
     assoc = int(args[2])

@@ -16,7 +16,6 @@ class CacheSim:
         }
         self.cache = np.zeros(shape=(nsets, assoc), dtype=int) -1
 
-
     def print_statistics(self):
         total = reduce(lambda x,y: x+y , self.MISSES.values())
         compulsory = self.MISSES['compulsory']
@@ -24,22 +23,29 @@ class CacheSim:
         print("----------CACHE STATS----------\n\n")
         print("-> ABSOLUTE STATS\n")
         print(f"COMPULSORY MISSES: {compulsory}")
-        print("CAPACITY ", end='') if self.nsets == 1 else print("CONFLICT ", end='')
         print(f"MISSES : {other}")
         print(f"TOTAL MISSES: {total}")
         print(f"TOTAL ACCESSES: {self.TOTAL_ACCESSES}\n")
 
         print("-> PERCENTAGE STATS\n")
+        total_misses = self.MISSES['compulsory'] + self.MISSES['other']
+        miss_rate = ((total_misses) / self.TOTAL_ACCESSES) * 100
+        compulsory_over_total = 100 * self.MISSES['compulsory'] / total_misses
+        print(f"MISS RATE: {miss_rate}%")
+        print(f"HIT RATE: {100 - miss_rate}%")
+        print(f"COMPULSORY MISSES/TOTAL MISSES: {compulsory_over_total}")
+        print("CAPACITY", end='') if self.nsets == 1 else print("CONFLICT", end='')
+        print(f"/TOTAL MISSES : {100 - compulsory_over_total}%")
 
+    
     def find_position(self, address):
         return int(address / self.bsize) % self.nsets 
-    
+        
     def insert(self, position, address, cache_set=None):
         if cache_set is None:
             cache_set = random.randint(0, self.assoc - 1)
         self.cache[position][cache_set] = address
     
-    #TODO: Computar adequadamente cada tipo de miss
     def get(self, address):
         position = self.find_position(address)
         first_address = int(address / self.bsize) * self.bsize
