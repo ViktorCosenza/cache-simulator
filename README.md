@@ -1,5 +1,8 @@
 # cache-simulator
-Requirements: python 3.7 numpy
+# Requirements
+->python 3.7
+
+->numpy
 
 # Instructions
 -> Executar o arquivo addressGenerator 'python3 addressGenerator.py <numero_de_enderecos>'
