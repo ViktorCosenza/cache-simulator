@@ -34,9 +34,9 @@ class CacheSim:
         compulsory_over_total = 100 * self.MISSES['compulsory'] / total_misses
         print(f"MISS RATE: {miss_rate}%")
         print(f"HIT RATE: {100 - miss_rate}%")
-        print(f"COMPULSORY MISSES/TOTAL MISSES: {compulsory_over_total}")
+        print(f"COMPULSORY MISSES/TOTAL MISSES: {compulsory_over_total} %")
         print("CAPACITY", end='') if self.nsets == 1 else print("CONFLICT", end='')
-        print(f"/TOTAL MISSES : {100 - compulsory_over_total}%")
+        print(f"/TOTAL MISSES : {100 - compulsory_over_total} %")
 
     
     def find_position(self, address):
