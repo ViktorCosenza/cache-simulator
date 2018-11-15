@@ -23,7 +23,8 @@ class CacheSim:
         print("----------CACHE STATS----------\n\n")
         print("-> ABSOLUTE STATS\n")
         print(f"COMPULSORY MISSES: {compulsory}")
-        print(f"MISSES : {other}")
+        print("CAPACITY", end='') if self.nsets == 1 else print("CONFLICT", end='')
+        print(f" MISSES : {other}")
         print(f"TOTAL MISSES: {total}")
         print(f"TOTAL ACCESSES: {self.TOTAL_ACCESSES}\n")
 

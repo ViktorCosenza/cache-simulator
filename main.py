@@ -10,8 +10,8 @@ def main():
     args = sys.argv[1].split(':')
     if len(args) < 3:
         return print("\nBad cache definition!\n nsets:bsize:assoc")
-    bsize = int(args[0])
-    nsets = int(args[1])
+    nsets = int(args[0])
+    bsize = int(args[1])
     assoc = int(args[2])
     file = open(sys.argv[2], "r").read()
     print("\n----------CACHE SETTINGS----------\n\n")
@@ -19,7 +19,7 @@ def main():
     print(f"NUMBER OF SETS: {nsets}")
     print(f"ASSOCIATIVITY: {assoc}\n\n")
 
-    c = CacheSim(bsize, nsets, assoc)
+    c = CacheSim(nsets, bsize, assoc)
     for value in file.split(','):
         c.get(int(value))
     c.print_statistics()

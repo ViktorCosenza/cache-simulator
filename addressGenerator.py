@@ -3,11 +3,12 @@ import random
 import sys
 
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         return print("Argument length required!")
     quantity = int(sys.argv[1])
+    filename = sys.argv[2]
     print(f"Generating {quantity} addresses")
-    generateAddresses(quantity=quantity, filename='test')
+    generateAddresses(quantity=quantity, filename=filename)
     print("Done!")
 
 def generateAddresses(quantity=100, seed=None, filename="adresses"):
