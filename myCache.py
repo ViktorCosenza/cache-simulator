@@ -1,6 +1,6 @@
-import numpy as np
 import random
 from functools import reduce
+from operator import add
 
 class CacheSim:
     
@@ -12,47 +12,66 @@ class CacheSim:
         self.TOTAL_ACCESSES = 0
         self.MISSES = {
             'compulsory': 0,
-            'other': 0
+            'capacity': 0,
+            'conflict': 0
         }
-        self.cache = np.zeros(shape=(nsets, assoc), dtype=int) -1
+        self.cache = [[-1 for block in range(assoc)] for cache_set in range(nsets)]
+        self.bit_val = [[0 for block in range(assoc)] for cache_set in range(nsets)]
 
     def print_statistics(self):
-        total = reduce(lambda x,y: x+y , self.MISSES.values())
+        total = reduce(add, self.MISSES.values())
         compulsory = self.MISSES['compulsory']
-        other = self.MISSES['other']
-        print("----------CACHE STATS----------\n\n")
+        capacity = self.MISSES['capacity']
+        conflict = self.MISSES['conflict']
+
+        print("----------CACHE STATS----------\n")
         print("-> ABSOLUTE STATS\n")
-        print(f"COMPULSORY MISSES: {compulsory}")
-        print("CAPACITY", end='') if self.nsets == 1 else print("CONFLICT", end='')
-        print(f" MISSES : {other}")
-        print(f"TOTAL MISSES: {total}")
-        print(f"TOTAL ACCESSES: {self.TOTAL_ACCESSES}\n")
+        print("COMPULSORY MISSES: {}".format(compulsory))
+        print("CAPACITY MISSES : {}".format(capacity))
+        print("CONFLICT MISSES: {}".format(conflict))
+        print("TOTAL MISSES: {}".format(total))
+        print("TOTAL ACCESSES: {}\n".format(self.TOTAL_ACCESSES))
 
+        miss_rate = ((total) / self.TOTAL_ACCESSES) * 100
+        compulsory_over_total = 100 * self.MISSES['compulsory'] / total
+        conflict_over_total = 100 * self.MISSES['conflict'] / total
+        capacity_over_total = 100 * self.MISSES['capacity'] / total
         print("-> PERCENTAGE STATS\n")
-        total_misses = self.MISSES['compulsory'] + self.MISSES['other']
-        miss_rate = ((total_misses) / self.TOTAL_ACCESSES) * 100
-        compulsory_over_total = 100 * self.MISSES['compulsory'] / total_misses
-        print(f"MISS RATE: {miss_rate}%")
-        print(f"HIT RATE: {100 - miss_rate}%")
-        print(f"COMPULSORY MISSES/TOTAL MISSES: {compulsory_over_total} %")
-        print("CAPACITY", end='') if self.nsets == 1 else print("CONFLICT", end='')
-        print(f"/TOTAL MISSES : {100 - compulsory_over_total} %")
-
+        print("MISS RATE: {0:.2f}%".format(miss_rate))
+        print("HIT RATE: {0:.2f}%".format(100 - miss_rate))
+        print("COMPULSORY/TOTAL MISSES: {0:.2f}%".format(compulsory_over_total))
+        print("CAPACITY/TOTAL MISSES: {0:.2f}%".format(capacity_over_total))
+        print("CONFLICT/TOTAL MISSES: {0:.2f}%".format(conflict_over_total))
     
     def find_position(self, address):
-        return int(address / self.bsize) % self.nsets 
+        return address // self.bsize % self.nsets 
         
     def insert(self, position, address, cache_set=None):
         if cache_set is None:
             cache_set = random.randint(0, self.assoc - 1)
         self.cache[position][cache_set] = address
     
+    def is_full(self):
+        for value in self.bit_val:
+            if value[0] == 0:
+                return False
+        return True
+
+    def reset_stats(self):
+        self.TOTAL_ACCESSES = 0
+        self.MISSES = {
+            'compulsory': 0,
+            'capacity': 0,
+            'conflict': 0
+        }
+    
     def get(self, address):
         position = self.find_position(address)
         first_address = int(address / self.bsize) * self.bsize
         for cache_set in range(self.assoc):
             #COMPULSORY MISS
-            if(self.cache[position][cache_set] == -1):
+            if(self.bit_val[position][cache_set] == 0):
+                self.bit_val[position][cache_set] = 1
                 self.insert(position, first_address, cache_set=cache_set)
                 self.MISSES['compulsory'] +=1
             #HIT
@@ -60,6 +79,9 @@ class CacheSim:
                 break
         #CAPACITY/CONFLICT MISS
         else:
+            if self.is_full():
+                self.MISSES['capacity'] += 1
+            else:
+                self.MISSES['conflict'] += 1
             self.insert(position, first_address)
-            self.MISSES['other'] += 1
         self.TOTAL_ACCESSES += 1
