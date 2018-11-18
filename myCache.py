@@ -46,15 +46,25 @@ class CacheSim:
     def find_position(self, address):
         return address // self.bsize % self.nsets 
         
-    def insert(self, position, address, cache_set=None):
-        if cache_set is None:
+    def insert(self, position, address):
+        for cache_set in range(self.assoc):
+            if self.bit_val[position][cache_set] == 0:
+                self.bit_val[position][cache_set] = 1
+                self.MISSES['compulsory'] +=1
+                break
+        else:
+            if self.is_full():
+                self.MISSES['capacity'] += 1
+            else:
+                self.MISSES['conflict'] += 1
             cache_set = random.randint(0, self.assoc - 1)
         self.cache[position][cache_set] = address
     
     def is_full(self):
-        for value in self.bit_val:
-            if value[0] == 0:
-                return False
+        for row in self.bit_val:
+            for value in row:
+                if value == 0:
+                    return False
         return True
 
     def reset_stats(self):
@@ -69,19 +79,8 @@ class CacheSim:
         position = self.find_position(address)
         first_address = int(address / self.bsize) * self.bsize
         for cache_set in range(self.assoc):
-            #COMPULSORY MISS
-            if(self.bit_val[position][cache_set] == 0):
-                self.bit_val[position][cache_set] = 1
-                self.insert(position, first_address, cache_set=cache_set)
-                self.MISSES['compulsory'] +=1
-            #HIT
             if(self.cache[position][cache_set] == first_address):
                 break
-        #CAPACITY/CONFLICT MISS
         else:
-            if self.is_full():
-                self.MISSES['capacity'] += 1
-            else:
-                self.MISSES['conflict'] += 1
             self.insert(position, first_address)
         self.TOTAL_ACCESSES += 1

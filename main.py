@@ -28,7 +28,8 @@ def main():
     fraction = int(test_length // 100)
     c = CacheSim(nsets, bsize, assoc)
     
-    if len(sys.argv) == 4:
+    if len(sys.argv) == 4 and sys.argv[3] == 'prefech':
+        print("Prefeching {} Values".format(c.size // c.bsize))
         for progress, value in enumerate(values):
             if progress == c.size / c.bsize:
                 break
