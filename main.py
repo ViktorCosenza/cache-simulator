@@ -31,9 +31,9 @@ def main():
     if len(sys.argv) == 4 and sys.argv[3] == 'prefech':
         print("Prefeching {} Values".format(c.size // c.bsize))
         for progress, value in enumerate(values):
-            if progress == c.size / c.bsize:
+            if c.is_full():
                 break
-            c.get(int(value))
+            c.get(int(value, 2))
         c.reset_stats()
     
     for progress, value in enumerate(values):

@@ -33,9 +33,14 @@ class CacheSim:
         print("TOTAL ACCESSES: {}\n".format(self.TOTAL_ACCESSES))
 
         miss_rate = ((total) / self.TOTAL_ACCESSES) * 100
-        compulsory_over_total = 100 * self.MISSES['compulsory'] / total
-        conflict_over_total = 100 * self.MISSES['conflict'] / total
-        capacity_over_total = 100 * self.MISSES['capacity'] / total
+        if total != 0:
+            compulsory_over_total = 100 * self.MISSES['compulsory'] / total
+            conflict_over_total = 100 * self.MISSES['conflict'] / total
+            capacity_over_total = 100 * self.MISSES['capacity'] / total
+        else:
+            compulsory_over_total = 0
+            conflict_over_total = 0
+            capacity_over_total = 0
         print("-> PERCENTAGE STATS\n")
         print("MISS RATE: {0:.2f}%".format(miss_rate))
         print("HIT RATE: {0:.2f}%".format(100 - miss_rate))
